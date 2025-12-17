@@ -100,6 +100,8 @@ import FloatingPickersDoc from "./pages/docs/components/FloatingPickersDoc";
 import WebPlayerDoc from "./pages/docs/components/WebPlayerDoc";
 import ZodFormDoc from "./pages/docs/components/ZodFormDoc";
 import HeadProviderDoc from "./pages/docs/components/HeadProviderDoc";
+import IconButtonDoc from "./pages/docs/components/IconButtonDoc";
+import TextEditorDoc from "./pages/docs/components/TextEditorDoc";
 
 // Hook docs
 import UseColorModeDoc from "./pages/docs/hooks/UseColorModeDoc";
@@ -212,6 +214,8 @@ const App = () => (
           <Route path="components/web-player" element={<WebPlayerDoc />} />
           <Route path="components/zod-form" element={<ZodFormDoc />} />
           <Route path="components/head-provider" element={<HeadProviderDoc />} />
+          <Route path="components/icon-button" element={<IconButtonDoc />} />
+          <Route path="components/text-editor" element={<TextEditorDoc />} />
           {/* Hooks */}
           <Route path="hooks/use-color-mode" element={<UseColorModeDoc />} />
           <Route path="hooks/use-theme" element={<UseThemeDoc />} />

@@ -141,8 +141,8 @@ export { Steps, Step, StepIndicator, StepStatus } from './Steps';
 export type { StepsProps, StepProps, StepIndicatorProps, StepStatusProps } from './Steps';
 
 // Code Editor
-export { CodeEditor, CodeBlock, CodeBlockRoot, CodeBlockHeader, CodeBlockContent, CodeBlockCopyTrigger } from './CodeEditor';
-export type { CodeEditorProps, CodeBlockRootProps, CodeBlockHeaderProps, CodeBlockContentProps, CodeBlockCopyTriggerProps } from './CodeEditor';
+export { CodeEditor, CodeBlock } from './CodeEditor';
+export type { CodeEditorProps, CodeBlockProps } from './CodeEditor';
 
 // Advanced Components
 export { ColorPicker, DatePicker, TimePicker, CommandPalette, DataTable, TreeView, FileTree, QRCode, Carousel, AlertDialog } from './AdvancedComponents';

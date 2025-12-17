@@ -5,14 +5,12 @@ import React, {
   useEffect,
   useCallback,
   KeyboardEvent,
-  ClipboardEvent,
 } from 'react';
 import { StyleProps, stylePropsToCSS, extractStyleProps } from '../system/style-props';
 
 export interface CodeEditorProps
   extends StyleProps,
     Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'color'> {
-  // Core
   value?: string;
   defaultValue?: string;
   onChange?: (value: string) => void;
@@ -20,160 +18,191 @@ export interface CodeEditorProps
   theme?: 'light' | 'dark';
   readOnly?: boolean;
   disabled?: boolean;
-  
-  // Behavior
   lineNumbers?: boolean;
   highlightActiveLine?: boolean;
   wordWrap?: boolean;
   tabSize?: number;
-  autoIndent?: boolean;
-  
-  // Features
   placeholder?: string;
   minHeight?: string | number;
   maxHeight?: string | number;
-  
-  // Events
+  showStatusBar?: boolean;
   onFocus?: () => void;
   onBlur?: () => void;
 }
 
-// Basic syntax highlighting patterns
-const languagePatterns: Record<string, { pattern: RegExp; className: string }[]> = {
-  javascript: [
-    { pattern: /(\/\/.*$)/gm, className: 'indo-code-comment' },
-    { pattern: /(\/\*[\s\S]*?\*\/)/g, className: 'indo-code-comment' },
-    { pattern: /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/g, className: 'indo-code-string' },
-    { pattern: /\b(const|let|var|function|return|if|else|for|while|class|import|export|from|default|async|await|try|catch|throw|new|typeof|instanceof)\b/g, className: 'indo-code-keyword' },
-    { pattern: /\b(true|false|null|undefined|NaN|Infinity)\b/g, className: 'indo-code-literal' },
-    { pattern: /\b(\d+\.?\d*)\b/g, className: 'indo-code-number' },
-    { pattern: /\b([A-Z][a-zA-Z0-9]*)\b/g, className: 'indo-code-class' },
-    { pattern: /(\w+)(?=\s*\()/g, className: 'indo-code-function' },
-  ],
-  typescript: [
-    { pattern: /(\/\/.*$)/gm, className: 'indo-code-comment' },
-    { pattern: /(\/\*[\s\S]*?\*\/)/g, className: 'indo-code-comment' },
-    { pattern: /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/g, className: 'indo-code-string' },
-    { pattern: /\b(const|let|var|function|return|if|else|for|while|class|import|export|from|default|async|await|try|catch|throw|new|typeof|instanceof|interface|type|enum|implements|extends|public|private|protected|readonly)\b/g, className: 'indo-code-keyword' },
-    { pattern: /\b(true|false|null|undefined|NaN|Infinity)\b/g, className: 'indo-code-literal' },
-    { pattern: /\b(\d+\.?\d*)\b/g, className: 'indo-code-number' },
-    { pattern: /:\s*(\w+)/g, className: 'indo-code-type' },
-    { pattern: /\b([A-Z][a-zA-Z0-9]*)\b/g, className: 'indo-code-class' },
-    { pattern: /(\w+)(?=\s*\()/g, className: 'indo-code-function' },
-  ],
-  jsx: [
-    { pattern: /(\/\/.*$)/gm, className: 'indo-code-comment' },
-    { pattern: /({\/\*[\s\S]*?\*\/})/g, className: 'indo-code-comment' },
-    { pattern: /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/g, className: 'indo-code-string' },
-    { pattern: /(<\/?[a-zA-Z][a-zA-Z0-9]*)/g, className: 'indo-code-tag' },
-    { pattern: /\b(const|let|var|function|return|if|else|for|while|class|import|export|from|default|async|await)\b/g, className: 'indo-code-keyword' },
-    { pattern: /(\w+)=/g, className: 'indo-code-attr' },
-    { pattern: /\b([A-Z][a-zA-Z0-9]*)\b/g, className: 'indo-code-component' },
-  ],
-  tsx: [
-    { pattern: /(\/\/.*$)/gm, className: 'indo-code-comment' },
-    { pattern: /({\/\*[\s\S]*?\*\/})/g, className: 'indo-code-comment' },
-    { pattern: /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/g, className: 'indo-code-string' },
-    { pattern: /(<\/?[a-zA-Z][a-zA-Z0-9]*)/g, className: 'indo-code-tag' },
-    { pattern: /\b(const|let|var|function|return|if|else|for|while|class|import|export|from|default|async|await|interface|type)\b/g, className: 'indo-code-keyword' },
-    { pattern: /(\w+)=/g, className: 'indo-code-attr' },
-    { pattern: /\b([A-Z][a-zA-Z0-9]*)\b/g, className: 'indo-code-component' },
-  ],
-  css: [
-    { pattern: /(\/\*[\s\S]*?\*\/)/g, className: 'indo-code-comment' },
-    { pattern: /([.#]?[a-zA-Z_-][a-zA-Z0-9_-]*)(?=\s*{)/g, className: 'indo-code-selector' },
-    { pattern: /([a-zA-Z-]+)(?=\s*:)/g, className: 'indo-code-property' },
-    { pattern: /(#[a-fA-F0-9]{3,8})/g, className: 'indo-code-color' },
-    { pattern: /(\d+\.?\d*)(px|em|rem|%|vh|vw|deg|s|ms)?/g, className: 'indo-code-number' },
-    { pattern: /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g, className: 'indo-code-string' },
-  ],
-  html: [
-    { pattern: /(<!--[\s\S]*?-->)/g, className: 'indo-code-comment' },
-    { pattern: /(<\/?[a-zA-Z][a-zA-Z0-9]*)/g, className: 'indo-code-tag' },
-    { pattern: /(\w+)=/g, className: 'indo-code-attr' },
-    { pattern: /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g, className: 'indo-code-string' },
-  ],
-  json: [
-    { pattern: /("(?:[^"\\]|\\.)*")\s*:/g, className: 'indo-code-property' },
-    { pattern: /:\s*("(?:[^"\\]|\\.)*")/g, className: 'indo-code-string' },
-    { pattern: /\b(true|false|null)\b/g, className: 'indo-code-literal' },
-    { pattern: /\b(-?\d+\.?\d*)\b/g, className: 'indo-code-number' },
-  ],
-};
+// Token types for syntax highlighting
+type TokenType = 'keyword' | 'string' | 'number' | 'comment' | 'function' | 'class' | 'tag' | 'attr' | 'operator' | 'punctuation' | 'property' | 'variable' | 'type' | 'default';
 
-const escapeHtml = (text: string): string => {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-};
+interface Token {
+  type: TokenType;
+  value: string;
+}
 
-const highlightCode = (code: string, language: string): string => {
-  if (!code) return '';
-  
-  const patterns = languagePatterns[language] || languagePatterns.javascript;
-  
-  // Tokenize the code first to avoid overlapping matches
-  interface Token {
-    type: string;
-    content: string;
-    start: number;
-    end: number;
-  }
-  
+// Simple tokenizer for various languages
+const tokenize = (code: string, language: string): Token[] => {
   const tokens: Token[] = [];
+  let remaining = code;
   
-  // Find all matches for all patterns
-  for (const { pattern, className } of patterns) {
-    const regex = new RegExp(pattern.source, pattern.flags);
-    let match;
-    while ((match = regex.exec(code)) !== null) {
-      tokens.push({
-        type: className,
-        content: match[0],
-        start: match.index,
-        end: match.index + match[0].length,
-      });
-      // Prevent infinite loop for zero-width matches
-      if (match[0].length === 0) break;
+  const patterns: { type: TokenType; regex: RegExp }[] = getPatterns(language);
+  
+  while (remaining.length > 0) {
+    let matched = false;
+    
+    for (const { type, regex } of patterns) {
+      const match = remaining.match(regex);
+      if (match && match.index === 0) {
+        tokens.push({ type, value: match[0] });
+        remaining = remaining.slice(match[0].length);
+        matched = true;
+        break;
+      }
+    }
+    
+    if (!matched) {
+      // Push single character as default
+      tokens.push({ type: 'default', value: remaining[0] });
+      remaining = remaining.slice(1);
     }
   }
   
-  // Sort tokens by start position, then by length (longer first)
-  tokens.sort((a, b) => a.start - b.start || b.content.length - a.content.length);
+  return tokens;
+};
+
+const getPatterns = (language: string): { type: TokenType; regex: RegExp }[] => {
+  const jsKeywords = /^(const|let|var|function|return|if|else|for|while|do|switch|case|break|continue|try|catch|finally|throw|new|delete|typeof|instanceof|in|of|class|extends|super|import|export|from|default|async|await|yield|static|get|set|this|null|undefined|true|false|NaN|Infinity)\b/;
+  const tsKeywords = /^(const|let|var|function|return|if|else|for|while|do|switch|case|break|continue|try|catch|finally|throw|new|delete|typeof|instanceof|in|of|class|extends|super|import|export|from|default|async|await|yield|static|get|set|this|null|undefined|true|false|NaN|Infinity|interface|type|enum|implements|public|private|protected|readonly|abstract|declare|namespace|module|as|is|keyof|infer|never|unknown|any|void|boolean|string|number|object|symbol|bigint)\b/;
   
-  // Remove overlapping tokens (keep the first/longest one)
-  const filteredTokens: Token[] = [];
-  let lastEnd = 0;
-  for (const token of tokens) {
-    if (token.start >= lastEnd) {
-      filteredTokens.push(token);
-      lastEnd = token.end;
-    }
+  switch (language) {
+    case 'typescript':
+    case 'tsx':
+      return [
+        { type: 'comment', regex: /^\/\/.*/ },
+        { type: 'comment', regex: /^\/\*[\s\S]*?\*\// },
+        { type: 'string', regex: /^`(?:[^`\\]|\\.)*`/ },
+        { type: 'string', regex: /^"(?:[^"\\]|\\.)*"/ },
+        { type: 'string', regex: /^'(?:[^'\\]|\\.)*'/ },
+        { type: 'keyword', regex: tsKeywords },
+        { type: 'number', regex: /^-?\d+\.?\d*(?:e[+-]?\d+)?/ },
+        { type: 'tag', regex: /^<\/?[A-Z][a-zA-Z0-9]*/ },
+        { type: 'tag', regex: /^<\/?[a-z][a-zA-Z0-9]*/ },
+        { type: 'class', regex: /^[A-Z][a-zA-Z0-9]*/ },
+        { type: 'function', regex: /^[a-z_$][a-zA-Z0-9_$]*(?=\s*\()/ },
+        { type: 'attr', regex: /^[a-z][a-zA-Z0-9]*(?=\s*=)/ },
+        { type: 'type', regex: /^:\s*[A-Z][a-zA-Z0-9<>,\s]*/ },
+        { type: 'operator', regex: /^[+\-*/%=<>!&|^~?:]+/ },
+        { type: 'punctuation', regex: /^[{}[\]().,;]/ },
+        { type: 'variable', regex: /^[a-z_$][a-zA-Z0-9_$]*/ },
+      ];
+    case 'javascript':
+    case 'jsx':
+      return [
+        { type: 'comment', regex: /^\/\/.*/ },
+        { type: 'comment', regex: /^\/\*[\s\S]*?\*\// },
+        { type: 'string', regex: /^`(?:[^`\\]|\\.)*`/ },
+        { type: 'string', regex: /^"(?:[^"\\]|\\.)*"/ },
+        { type: 'string', regex: /^'(?:[^'\\]|\\.)*'/ },
+        { type: 'keyword', regex: jsKeywords },
+        { type: 'number', regex: /^-?\d+\.?\d*(?:e[+-]?\d+)?/ },
+        { type: 'tag', regex: /^<\/?[A-Z][a-zA-Z0-9]*/ },
+        { type: 'tag', regex: /^<\/?[a-z][a-zA-Z0-9]*/ },
+        { type: 'class', regex: /^[A-Z][a-zA-Z0-9]*/ },
+        { type: 'function', regex: /^[a-z_$][a-zA-Z0-9_$]*(?=\s*\()/ },
+        { type: 'attr', regex: /^[a-z][a-zA-Z0-9]*(?=\s*=)/ },
+        { type: 'operator', regex: /^[+\-*/%=<>!&|^~?:]+/ },
+        { type: 'punctuation', regex: /^[{}[\]().,;]/ },
+        { type: 'variable', regex: /^[a-z_$][a-zA-Z0-9_$]*/ },
+      ];
+    case 'css':
+      return [
+        { type: 'comment', regex: /^\/\*[\s\S]*?\*\// },
+        { type: 'string', regex: /^"(?:[^"\\]|\\.)*"/ },
+        { type: 'string', regex: /^'(?:[^'\\]|\\.)*'/ },
+        { type: 'keyword', regex: /^@[a-zA-Z-]+/ },
+        { type: 'class', regex: /^\.[a-zA-Z_-][a-zA-Z0-9_-]*/ },
+        { type: 'tag', regex: /^#[a-zA-Z_-][a-zA-Z0-9_-]*/ },
+        { type: 'property', regex: /^[a-z-]+(?=\s*:)/ },
+        { type: 'number', regex: /^-?\d+\.?\d*(px|em|rem|%|vh|vw|deg|s|ms)?/ },
+        { type: 'function', regex: /^[a-z-]+(?=\s*\()/ },
+        { type: 'punctuation', regex: /^[{}:;,]/ },
+      ];
+    case 'json':
+      return [
+        { type: 'string', regex: /^"(?:[^"\\]|\\.)*"(?=\s*:)/ },
+        { type: 'string', regex: /^"(?:[^"\\]|\\.)*"/ },
+        { type: 'keyword', regex: /^(true|false|null)\b/ },
+        { type: 'number', regex: /^-?\d+\.?\d*(?:e[+-]?\d+)?/ },
+        { type: 'punctuation', regex: /^[{}[\]:,]/ },
+      ];
+    case 'html':
+      return [
+        { type: 'comment', regex: /^<!--[\s\S]*?-->/ },
+        { type: 'tag', regex: /^<\/?[a-zA-Z][a-zA-Z0-9]*/ },
+        { type: 'string', regex: /^"(?:[^"\\]|\\.)*"/ },
+        { type: 'string', regex: /^'(?:[^'\\]|\\.)*'/ },
+        { type: 'attr', regex: /^[a-zA-Z-]+(?=\s*=)/ },
+        { type: 'punctuation', regex: /^[<>\/=]/ },
+      ];
+    default:
+      return [
+        { type: 'comment', regex: /^\/\/.*/ },
+        { type: 'comment', regex: /^\/\*[\s\S]*?\*\// },
+        { type: 'string', regex: /^"(?:[^"\\]|\\.)*"/ },
+        { type: 'string', regex: /^'(?:[^'\\]|\\.)*'/ },
+        { type: 'keyword', regex: jsKeywords },
+        { type: 'number', regex: /^-?\d+\.?\d*/ },
+        { type: 'operator', regex: /^[+\-*/%=<>!&|^~?:]+/ },
+        { type: 'punctuation', regex: /^[{}[\]().,;]/ },
+      ];
   }
+};
+
+// Color scheme (Tokyo Night inspired)
+const getTokenColor = (type: TokenType, theme: 'light' | 'dark'): string => {
+  const colors = theme === 'dark' ? {
+    keyword: '#bb9af7',      // Purple
+    string: '#9ece6a',       // Green  
+    number: '#ff9e64',       // Orange
+    comment: '#565f89',      // Gray
+    function: '#7aa2f7',     // Blue
+    class: '#2ac3de',        // Cyan
+    tag: '#f7768e',          // Pink/Red
+    attr: '#e0af68',         // Yellow
+    operator: '#89ddff',     // Light blue
+    punctuation: '#9aa5ce',  // Light gray
+    property: '#73daca',     // Teal
+    variable: '#c0caf5',     // Light purple
+    type: '#2ac3de',         // Cyan
+    default: '#a9b1d6',      // Default text
+  } : {
+    keyword: '#8839ef',      // Purple
+    string: '#40a02b',       // Green
+    number: '#fe640b',       // Orange
+    comment: '#9ca0b0',      // Gray
+    function: '#1e66f5',     // Blue
+    class: '#179299',        // Teal
+    tag: '#d20f39',          // Red
+    attr: '#df8e1d',         // Yellow
+    operator: '#04a5e5',     // Sky
+    punctuation: '#6c6f85',  // Gray
+    property: '#179299',     // Teal
+    variable: '#4c4f69',     // Dark text
+    type: '#179299',         // Teal
+    default: '#4c4f69',      // Default text
+  };
   
-  // Build the highlighted output
-  let result = '';
-  let currentIndex = 0;
+  return colors[type] || colors.default;
+};
+
+const highlightLine = (line: string, language: string, theme: 'light' | 'dark'): React.ReactNode[] => {
+  if (!line) return [<span key="empty">&nbsp;</span>];
   
-  for (const token of filteredTokens) {
-    // Add any unhighlighted text before this token
-    if (token.start > currentIndex) {
-      result += escapeHtml(code.slice(currentIndex, token.start));
-    }
-    // Add the highlighted token
-    result += `<span class="${token.type}">${escapeHtml(token.content)}</span>`;
-    currentIndex = token.end;
-  }
+  const tokens = tokenize(line, language);
   
-  // Add any remaining unhighlighted text
-  if (currentIndex < code.length) {
-    result += escapeHtml(code.slice(currentIndex));
-  }
-  
-  return result;
+  return tokens.map((token, i) => (
+    <span key={i} style={{ color: getTokenColor(token.type, theme) }}>
+      {token.value}
+    </span>
+  ));
 };
 
 export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(
@@ -182,7 +211,7 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(
       value: controlledValue,
       defaultValue = '',
       onChange,
-      language = 'javascript',
+      language = 'typescript',
       theme = 'dark',
       readOnly = false,
       disabled = false,
@@ -190,10 +219,10 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(
       highlightActiveLine = true,
       wordWrap = false,
       tabSize = 2,
-      autoIndent = true,
       placeholder = 'Start typing...',
-      minHeight = '200px',
+      minHeight = '300px',
       maxHeight,
+      showStatusBar = true,
       onFocus,
       onBlur,
       className = '',
@@ -208,10 +237,10 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(
     const [internalValue, setInternalValue] = useState(defaultValue);
     const [isFocused, setIsFocused] = useState(false);
     const [activeLine, setActiveLine] = useState(0);
-    const [cursorPosition, setCursorPosition] = useState({ line: 0, column: 0 });
+    const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
     
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const codeRef = useRef<HTMLPreElement>(null);
+    const preRef = useRef<HTMLPreElement>(null);
     
     const value = controlledValue !== undefined ? controlledValue : internalValue;
     const lines = value.split('\n');
@@ -223,23 +252,17 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(
       onChange?.(newValue);
     }, [controlledValue, onChange]);
     
-    const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      handleChange(e.target.value);
-    };
-    
     const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
       const textarea = textareaRef.current;
       if (!textarea) return;
       
       const { selectionStart, selectionEnd } = textarea;
       
-      // Handle Tab
       if (e.key === 'Tab') {
         e.preventDefault();
         const indent = ' '.repeat(tabSize);
         
         if (e.shiftKey) {
-          // Unindent
           const beforeCursor = value.slice(0, selectionStart);
           const lineStart = beforeCursor.lastIndexOf('\n') + 1;
           const lineContent = value.slice(lineStart, selectionEnd);
@@ -252,7 +275,6 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(
             }, 0);
           }
         } else {
-          // Indent
           const newValue = value.slice(0, selectionStart) + indent + value.slice(selectionEnd);
           handleChange(newValue);
           setTimeout(() => {
@@ -261,8 +283,7 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(
         }
       }
       
-      // Handle Enter with auto-indent
-      if (e.key === 'Enter' && autoIndent) {
+      if (e.key === 'Enter') {
         e.preventDefault();
         const beforeCursor = value.slice(0, selectionStart);
         const lineStart = beforeCursor.lastIndexOf('\n') + 1;
@@ -270,9 +291,8 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(
         const indentMatch = currentLine.match(/^(\s*)/);
         const currentIndent = indentMatch ? indentMatch[1] : '';
         
-        // Check if we should add extra indent (after { or :)
         const lastChar = beforeCursor.trim().slice(-1);
-        const extraIndent = ['{', ':', '(', '['].includes(lastChar) ? ' '.repeat(tabSize) : '';
+        const extraIndent = ['{', '(', '[', ':'].includes(lastChar) ? ' '.repeat(tabSize) : '';
         
         const newValue = value.slice(0, selectionStart) + '\n' + currentIndent + extraIndent + value.slice(selectionEnd);
         handleChange(newValue);
@@ -282,17 +302,9 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(
         }, 0);
       }
       
-      // Handle bracket auto-close
-      if (['(', '[', '{', '"', "'", '`'].includes(e.key)) {
-        const pairs: Record<string, string> = {
-          '(': ')',
-          '[': ']',
-          '{': '}',
-          '"': '"',
-          "'": "'",
-          '`': '`',
-        };
-        
+      // Auto-close brackets
+      const pairs: Record<string, string> = { '(': ')', '[': ']', '{': '}', '"': '"', "'": "'", '`': '`' };
+      if (pairs[e.key]) {
         e.preventDefault();
         const newValue = value.slice(0, selectionStart) + e.key + pairs[e.key] + value.slice(selectionEnd);
         handleChange(newValue);
@@ -303,9 +315,9 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(
     };
     
     const handleScroll = () => {
-      if (textareaRef.current && codeRef.current) {
-        codeRef.current.scrollTop = textareaRef.current.scrollTop;
-        codeRef.current.scrollLeft = textareaRef.current.scrollLeft;
+      if (textareaRef.current && preRef.current) {
+        preRef.current.scrollTop = textareaRef.current.scrollTop;
+        preRef.current.scrollLeft = textareaRef.current.scrollLeft;
       }
     };
     
@@ -313,117 +325,192 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(
       if (textareaRef.current) {
         const { selectionStart } = textareaRef.current;
         const textBefore = value.slice(0, selectionStart);
-        const lineNumber = textBefore.split('\n').length - 1;
-        const columnNumber = selectionStart - textBefore.lastIndexOf('\n') - 1;
+        const lineNum = textBefore.split('\n').length;
+        const colNum = selectionStart - textBefore.lastIndexOf('\n');
         
-        setActiveLine(lineNumber);
-        setCursorPosition({ line: lineNumber, column: columnNumber });
+        setActiveLine(lineNum - 1);
+        setCursorPos({ line: lineNum, col: colNum });
       }
     };
     
-    const handleFocus = () => {
-      setIsFocused(true);
-      onFocus?.();
-    };
-    
-    const handleBlur = () => {
-      setIsFocused(false);
-      onBlur?.();
-    };
-    
-    const handlePaste = (e: ClipboardEvent<HTMLTextAreaElement>) => {
-      // Allow default paste behavior
-    };
-    
-    // Sync scroll on value change
     useEffect(() => {
       handleScroll();
     }, [value]);
     
-    const editorTheme = theme === 'dark' ? 'indo-code-editor-dark' : 'indo-code-editor-light';
+    const bgColor = theme === 'dark' ? '#1a1b26' : '#fafafa';
+    const gutterBg = theme === 'dark' ? '#16161e' : '#f4f4f5';
+    const gutterText = theme === 'dark' ? '#565f89' : '#a1a1aa';
+    const activeLineBg = theme === 'dark' ? 'rgba(41, 46, 66, 0.5)' : 'rgba(0, 0, 0, 0.04)';
+    const borderColor = theme === 'dark' ? '#292e42' : '#e4e4e7';
+    const statusBg = theme === 'dark' ? '#16161e' : '#f4f4f5';
     
     return (
       <div
         ref={ref}
-        className={`indo-code-editor ${editorTheme} ${isFocused ? 'indo-code-editor-focused' : ''} ${disabled ? 'indo-code-editor-disabled' : ''} ${className}`}
+        className={className}
         style={{
-          ...cssStyles,
+          display: 'flex',
+          flexDirection: 'column',
+          fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace",
+          fontSize: '14px',
+          lineHeight: '1.6',
+          backgroundColor: bgColor,
+          borderRadius: '8px',
+          border: `1px solid ${borderColor}`,
+          overflow: 'hidden',
           minHeight,
           maxHeight,
+          ...cssStyles,
           ...style,
         }}
         {...restProps}
       >
-        {/* Line Numbers */}
-        {lineNumbers && (
-          <div className="indo-code-gutter">
-            {lines.map((_, index) => (
-              <div
-                key={index}
-                className={`indo-code-line-number ${activeLine === index ? 'indo-code-line-number-active' : ''}`}
-              >
-                {index + 1}
-              </div>
-            ))}
+        {/* Editor area */}
+        <div style={{ display: 'flex', flex: 1, overflow: 'hidden', position: 'relative' }}>
+          {/* Line numbers gutter */}
+          {lineNumbers && (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                backgroundColor: gutterBg,
+                color: gutterText,
+                padding: '12px 0',
+                userSelect: 'none',
+                textAlign: 'right',
+                minWidth: '50px',
+                borderRight: `1px solid ${borderColor}`,
+              }}
+            >
+              {lines.map((_, i) => (
+                <div
+                  key={i}
+                  style={{
+                    padding: '0 12px',
+                    lineHeight: '1.6',
+                    backgroundColor: highlightActiveLine && activeLine === i ? activeLineBg : 'transparent',
+                    color: activeLine === i ? (theme === 'dark' ? '#7aa2f7' : '#2563eb') : gutterText,
+                    fontWeight: activeLine === i ? 500 : 400,
+                  }}
+                >
+                  {i + 1}
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* Code area */}
+          <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+            {/* Highlighted code layer */}
+            <pre
+              ref={preRef}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                margin: 0,
+                padding: '12px',
+                overflow: 'auto',
+                whiteSpace: wordWrap ? 'pre-wrap' : 'pre',
+                wordBreak: wordWrap ? 'break-word' : 'normal',
+                pointerEvents: 'none',
+              }}
+            >
+              {lines.map((line, i) => (
+                <div
+                  key={i}
+                  style={{
+                    backgroundColor: highlightActiveLine && activeLine === i ? activeLineBg : 'transparent',
+                    minHeight: '1.6em',
+                    paddingLeft: '4px',
+                    marginLeft: '-4px',
+                    marginRight: '-4px',
+                    paddingRight: '4px',
+                  }}
+                >
+                  {highlightLine(line, language, theme)}
+                </div>
+              ))}
+            </pre>
+            
+            {/* Input textarea */}
+            <textarea
+              ref={textareaRef}
+              value={value}
+              onChange={(e) => handleChange(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onScroll={handleScroll}
+              onSelect={handleSelect}
+              onFocus={() => { setIsFocused(true); onFocus?.(); }}
+              onBlur={() => { setIsFocused(false); onBlur?.(); }}
+              readOnly={readOnly}
+              disabled={disabled}
+              placeholder={!value ? placeholder : undefined}
+              spellCheck={false}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                width: '100%',
+                height: '100%',
+                padding: '12px',
+                margin: 0,
+                border: 'none',
+                outline: 'none',
+                resize: 'none',
+                background: 'transparent',
+                color: 'transparent',
+                caretColor: theme === 'dark' ? '#c0caf5' : '#4c4f69',
+                fontFamily: 'inherit',
+                fontSize: 'inherit',
+                lineHeight: 'inherit',
+                whiteSpace: wordWrap ? 'pre-wrap' : 'pre',
+                wordBreak: wordWrap ? 'break-word' : 'normal',
+                overflow: 'auto',
+                tabSize,
+              }}
+            />
+          </div>
+        </div>
+        
+        {/* Status bar */}
+        {showStatusBar && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '4px 12px',
+              backgroundColor: statusBg,
+              borderTop: `1px solid ${borderColor}`,
+              fontSize: '12px',
+              color: gutterText,
+            }}
+          >
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <span style={{ 
+                backgroundColor: theme === 'dark' ? '#7aa2f7' : '#2563eb',
+                color: 'white',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                fontWeight: 500,
+              }}>
+                {language.toUpperCase()}
+              </span>
+            </div>
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <span>Ln {cursorPos.line}, Col {cursorPos.col}</span>
+              <span>{lines.length} lines</span>
+            </div>
           </div>
         )}
-        
-        {/* Code Area */}
-        <div className="indo-code-content">
-          {/* Highlighted Code (background layer) */}
-          <pre
-            ref={codeRef}
-            className="indo-code-highlight"
-            aria-hidden="true"
-          >
-            {lines.map((line, index) => (
-              <div
-                key={index}
-                className={`indo-code-line ${highlightActiveLine && activeLine === index ? 'indo-code-line-active' : ''}`}
-              >
-                <code
-                  dangerouslySetInnerHTML={{
-                    __html: highlightCode(line, language) || ' ',
-                  }}
-                />
-              </div>
-            ))}
-          </pre>
-          
-          {/* Textarea (input layer) */}
-          <textarea
-            ref={textareaRef}
-            className="indo-code-textarea"
-            value={value}
-            onChange={handleTextareaChange}
-            onKeyDown={handleKeyDown}
-            onScroll={handleScroll}
-            onSelect={handleSelect}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onPaste={handlePaste}
-            readOnly={readOnly}
-            disabled={disabled}
-            placeholder={!value ? placeholder : undefined}
-            spellCheck={false}
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            style={{
-              tabSize,
-              MozTabSize: tabSize,
-              whiteSpace: wordWrap ? 'pre-wrap' : 'pre',
-            } as React.CSSProperties}
-          />
-        </div>
-        
-        {/* Status Bar */}
-        <div className="indo-code-statusbar">
-          <span className="indo-code-language">{language}</span>
-          <span className="indo-code-position">
-            Ln {cursorPosition.line + 1}, Col {cursorPosition.column + 1}
-          </span>
-        </div>
       </div>
     );
   }
@@ -431,169 +518,82 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(
 
 CodeEditor.displayName = 'CodeEditor';
 
-// Composable CodeBlock components
-export interface CodeBlockRootProps extends StyleProps, React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
-}
-
-export const CodeBlockRoot = forwardRef<HTMLDivElement, CodeBlockRootProps>(
-  ({ children, className = '', style, ...props }, ref) => {
-    const { styleProps, restProps } = extractStyleProps(props);
-    const cssStyles = stylePropsToCSS(styleProps);
-    
-    return (
-      <div
-        ref={ref}
-        className={`indo-codeblock ${className}`}
-        style={{ ...cssStyles, ...style }}
-        {...restProps}
-      >
-        {children}
-      </div>
-    );
-  }
-);
-
-CodeBlockRoot.displayName = 'CodeBlock.Root';
-
-export interface CodeBlockHeaderProps extends StyleProps, React.HTMLAttributes<HTMLDivElement> {
-  children?: React.ReactNode;
-}
-
-export const CodeBlockHeader = forwardRef<HTMLDivElement, CodeBlockHeaderProps>(
-  ({ children, className = '', style, ...props }, ref) => {
-    const { styleProps, restProps } = extractStyleProps(props);
-    const cssStyles = stylePropsToCSS(styleProps);
-    
-    return (
-      <div
-        ref={ref}
-        className={`indo-codeblock-header ${className}`}
-        style={{ ...cssStyles, ...style }}
-        {...restProps}
-      >
-        {children}
-      </div>
-    );
-  }
-);
-
-CodeBlockHeader.displayName = 'CodeBlock.Header';
-
-export interface CodeBlockContentProps extends StyleProps, React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
-  language?: string;
-  showLineNumbers?: boolean;
-  highlightLines?: number[];
-  maxLines?: number;
-}
-
-export const CodeBlockContent = forwardRef<HTMLDivElement, CodeBlockContentProps>(
-  (
-    {
-      children,
-      language = 'javascript',
-      showLineNumbers = false,
-      highlightLines = [],
-      maxLines,
-      className = '',
-      style,
-      ...props
-    },
-    ref
-  ) => {
-    const { styleProps, restProps } = extractStyleProps(props);
-    const cssStyles = stylePropsToCSS(styleProps);
-    
-    const code = typeof children === 'string' ? children : '';
-    const lines = code.split('\n');
-    const displayLines = maxLines ? lines.slice(0, maxLines) : lines;
-    
-    return (
-      <div
-        ref={ref}
-        className={`indo-codeblock-content ${className}`}
-        style={{ ...cssStyles, ...style }}
-        {...restProps}
-      >
-        {showLineNumbers && (
-          <div className="indo-codeblock-gutter">
-            {displayLines.map((_, index) => (
-              <span key={index} className="indo-codeblock-line-number">
-                {index + 1}
-              </span>
-            ))}
-          </div>
-        )}
-        <pre className="indo-codeblock-pre">
-          <code className={`indo-codeblock-code language-${language}`}>
-            {displayLines.map((line, index) => (
-              <div
-                key={index}
-                className={`indo-codeblock-line ${highlightLines.includes(index + 1) ? 'indo-codeblock-line-highlighted' : ''}`}
-                dangerouslySetInnerHTML={{
-                  __html: highlightCode(line, language) || ' ',
-                }}
-              />
-            ))}
-          </code>
-        </pre>
-        {maxLines && lines.length > maxLines && (
-          <div className="indo-codeblock-overflow">
-            +{lines.length - maxLines} more lines
-          </div>
-        )}
-      </div>
-    );
-  }
-);
-
-CodeBlockContent.displayName = 'CodeBlock.Content';
-
-export interface CodeBlockCopyTriggerProps
-  extends StyleProps,
-    React.ButtonHTMLAttributes<HTMLButtonElement> {
+// Simple CodeBlock for display only
+export interface CodeBlockProps extends StyleProps, React.HTMLAttributes<HTMLDivElement> {
   code: string;
-  onCopied?: () => void;
+  language?: string;
+  theme?: 'light' | 'dark';
+  showLineNumbers?: boolean;
+  title?: string;
 }
 
-export const CodeBlockCopyTrigger = forwardRef<HTMLButtonElement, CodeBlockCopyTriggerProps>(
-  ({ code, onCopied, children, className = '', style, ...props }, ref) => {
+export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(
+  ({ code, language = 'typescript', theme = 'dark', showLineNumbers = true, title, className = '', style, ...props }, ref) => {
     const { styleProps, restProps } = extractStyleProps(props);
     const cssStyles = stylePropsToCSS(styleProps);
-    const [copied, setCopied] = useState(false);
     
-    const handleCopy = async () => {
-      try {
-        await navigator.clipboard.writeText(code);
-        setCopied(true);
-        onCopied?.();
-        setTimeout(() => setCopied(false), 2000);
-      } catch (err) {
-        console.error('Failed to copy:', err);
-      }
-    };
+    const lines = code.split('\n');
+    const bgColor = theme === 'dark' ? '#1a1b26' : '#fafafa';
+    const gutterBg = theme === 'dark' ? '#16161e' : '#f4f4f5';
+    const gutterText = theme === 'dark' ? '#565f89' : '#a1a1aa';
+    const borderColor = theme === 'dark' ? '#292e42' : '#e4e4e7';
     
     return (
-      <button
+      <div
         ref={ref}
-        className={`indo-codeblock-copy ${copied ? 'indo-codeblock-copied' : ''} ${className}`}
-        style={{ ...cssStyles, ...style }}
-        onClick={handleCopy}
+        className={className}
+        style={{
+          fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, monospace",
+          fontSize: '13px',
+          lineHeight: '1.6',
+          backgroundColor: bgColor,
+          borderRadius: '8px',
+          border: `1px solid ${borderColor}`,
+          overflow: 'hidden',
+          ...cssStyles,
+          ...style,
+        }}
         {...restProps}
       >
-        {children || (copied ? 'Copied!' : 'Copy')}
-      </button>
+        {title && (
+          <div style={{
+            padding: '8px 12px',
+            backgroundColor: gutterBg,
+            borderBottom: `1px solid ${borderColor}`,
+            color: gutterText,
+            fontSize: '12px',
+            fontWeight: 500,
+          }}>
+            {title}
+          </div>
+        )}
+        <div style={{ display: 'flex', overflow: 'auto' }}>
+          {showLineNumbers && (
+            <div style={{
+              backgroundColor: gutterBg,
+              color: gutterText,
+              padding: '12px 0',
+              userSelect: 'none',
+              textAlign: 'right',
+              minWidth: '40px',
+              borderRight: `1px solid ${borderColor}`,
+            }}>
+              {lines.map((_, i) => (
+                <div key={i} style={{ padding: '0 12px' }}>{i + 1}</div>
+              ))}
+            </div>
+          )}
+          <pre style={{ flex: 1, margin: 0, padding: '12px', overflow: 'auto' }}>
+            {lines.map((line, i) => (
+              <div key={i} style={{ minHeight: '1.6em' }}>
+                {highlightLine(line, language, theme)}
+              </div>
+            ))}
+          </pre>
+        </div>
+      </div>
     );
   }
 );
 
-CodeBlockCopyTrigger.displayName = 'CodeBlock.CopyTrigger';
-
-// Compound export
-export const CodeBlock = {
-  Root: CodeBlockRoot,
-  Header: CodeBlockHeader,
-  Content: CodeBlockContent,
-  CopyTrigger: CodeBlockCopyTrigger,
-};
+CodeBlock.displayName = 'CodeBlock';
