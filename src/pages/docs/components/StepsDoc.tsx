@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Box, VStack, HStack, Heading, Text, Card, Badge, Button, Steps,
+  Box, VStack, HStack, Heading, Text, Card, Badge, Button, Steps, Step,
   Table, TableHead, TableBody, TableRow, TableCell, TableHeaderCell,
 } from "../../../../lib/indoui/src";
 import { CodeBlock } from "../../../components/docs/CodeBlock";
@@ -52,8 +52,7 @@ const StepsDoc = () => {
             <Step title="Step 2" description="Second step completed" />
             <Step title="Step 3" description="Current step" />
             <Step title="Step 4" description="Pending step" />
-            ]}
-          />
+          </Steps>
         </Card>
 
         <Card variant="outline" p={6}>
