@@ -18,7 +18,7 @@ const TextDoc = () => {
 
         <Card variant="outline" p={6}>
           <Heading as="h3" size="md" mb={4}>Sizes</Heading>
-          <VStack spacing={3} align="start">
+          <VStack spacing={3} align="flex-start">
             <Text size="xs">Extra Small Text (xs)</Text>
             <Text size="sm">Small Text (sm)</Text>
             <Text size="md">Medium Text (md)</Text>
@@ -29,7 +29,7 @@ const TextDoc = () => {
 
         <Card variant="outline" p={6}>
           <Heading as="h3" size="md" mb={4}>Styling</Heading>
-          <VStack spacing={3} align="start">
+          <VStack spacing={3} align="flex-start">
             <Text fontWeight="bold">Bold Text</Text>
             <Text fontStyle="italic">Italic Text</Text>
             <Text textDecoration="underline">Underlined Text</Text>

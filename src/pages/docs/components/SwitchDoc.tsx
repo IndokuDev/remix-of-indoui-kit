@@ -21,7 +21,7 @@ const SwitchDoc = () => {
 
         <Card variant="outline" p={6}>
           <Heading as="h3" size="md" mb={4}>Basic Usage</Heading>
-          <VStack spacing={4} align="start">
+          <VStack spacing={4} align="flex-start">
             <HStack>
               <Switch isChecked={isOn} onChange={() => setIsOn(!isOn)} />
               <Text>Notifications: {isOn ? 'On' : 'Off'}</Text>
@@ -49,10 +49,10 @@ const SwitchDoc = () => {
         <Card variant="outline" p={6}>
           <Heading as="h3" size="md" mb={4}>Colors</Heading>
           <HStack spacing={4}>
-            <Switch colorPalette="blue" defaultChecked />
-            <Switch colorPalette="green" defaultChecked />
-            <Switch colorPalette="red" defaultChecked />
-            <Switch colorPalette="purple" defaultChecked />
+            <Switch colorPalette="primary" defaultChecked />
+            <Switch colorPalette="success" defaultChecked />
+            <Switch colorPalette="warning" defaultChecked />
+            <Switch colorPalette="destructive" defaultChecked />
           </HStack>
         </Card>
 

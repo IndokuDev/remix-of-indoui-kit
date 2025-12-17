@@ -18,7 +18,7 @@ const HeadingDoc = () => {
 
         <Card variant="outline" p={6}>
           <Heading as="h3" size="md" mb={4}>Sizes</Heading>
-          <VStack spacing={3} align="start">
+          <VStack spacing={3} align="flex-start">
             <Heading size="4xl">Heading 4xl</Heading>
             <Heading size="3xl">Heading 3xl</Heading>
             <Heading size="2xl">Heading 2xl</Heading>
@@ -31,7 +31,7 @@ const HeadingDoc = () => {
 
         <Card variant="outline" p={6}>
           <Heading as="h3" size="md" mb={4}>Semantic Tags</Heading>
-          <VStack spacing={3} align="start">
+          <VStack spacing={3} align="flex-start">
             <Heading as="h1" size="xl">h1 Heading</Heading>
             <Heading as="h2" size="lg">h2 Heading</Heading>
             <Heading as="h3" size="md">h3 Heading</Heading>
