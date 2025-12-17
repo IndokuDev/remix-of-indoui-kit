@@ -172,8 +172,6 @@ export const DrawerHeader = forwardRef<HTMLDivElement, DrawerHeaderProps>(
       p={6}
       fontSize="var(--indo-text-lg)"
       fontWeight={600}
-      borderBottom="1px solid"
-      borderColor="border"
       {...props}
     >
       {children}
@@ -202,8 +200,6 @@ export const DrawerFooter = forwardRef<HTMLDivElement, DrawerFooterProps>(
     <Box
       ref={ref}
       p={6}
-      borderTop="1px solid"
-      borderColor="border"
       display="flex"
       justifyContent="flex-end"
       gap={3}

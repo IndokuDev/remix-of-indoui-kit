@@ -340,7 +340,7 @@ export const generateCSSVariables = (mode: 'light' | 'dark' = 'light') => {
   const baseVars = `
     /* Typography */
     --indo-font-sans: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    --indo-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+    --indo-font-mono: 'Fira Code', 'Source Code Pro', 'Cascadia Code', 'JetBrains Mono', ui-monospace, monospace;
     --indo-font-display: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
     
     /* Font Sizes */
