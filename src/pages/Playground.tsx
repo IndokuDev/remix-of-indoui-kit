@@ -376,7 +376,6 @@ const Playground = () => {
                 <WebPlayer
                   code={activeFile?.content || "// No code"}
                   language={(activeFile?.language === "tsx" || activeFile?.language === "jsx") ? activeFile.language : "tsx"}
-                  showCode={false}
                   showConsole={false}
                   height="100%"
                   theme="dark"

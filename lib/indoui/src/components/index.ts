@@ -92,8 +92,8 @@ export type { AvatarProps, AvatarGroupProps } from './Avatar';
 export { Table, TableHead, TableBody, TableRow, TableCell, TableHeaderCell } from './Table';
 export type { TableProps, TableHeadProps, TableBodyProps, TableRowProps, TableCellProps, TableHeaderCellProps } from './Table';
 
-export { Image, Stat, StatLabel, StatNumber, StatHelpText, StatArrow, StatGroup, EmptyState, Timeline, TimelineItem, Pagination } from './DataDisplay';
-export type { ImageProps, StatProps, StatLabelProps, StatNumberProps, StatHelpTextProps, StatArrowProps, StatGroupProps, EmptyStateProps, TimelineProps, TimelineItemProps, PaginationProps } from './DataDisplay';
+export { Image, EmptyState, Timeline, TimelineItem, Pagination } from './DataDisplay';
+export type { ImageProps, EmptyStateProps, TimelineProps, TimelineItemProps, PaginationProps } from './DataDisplay';
 
 // Feedback
 export { Skeleton, SkeletonText, SkeletonCircle } from './Skeleton';
@@ -144,9 +144,33 @@ export type { StepsProps, StepProps, StepIndicatorProps, StepStatusProps } from 
 export { CodeEditor, CodeBlock } from './CodeEditor';
 export type { CodeEditorProps, CodeBlockProps } from './CodeEditor';
 
-// Advanced Components
-export { ColorPicker, DatePicker, TimePicker, CommandPalette, DataTable, TreeView, FileTree, QRCode, Carousel, AlertDialog } from './AdvancedComponents';
-export type { ColorPickerProps, DatePickerProps, TimePickerProps, CommandPaletteProps, CommandPaletteItem, DataTableProps, DataTableColumn, TreeViewProps, TreeNode, FileTreeProps, FileTreeItem, QRCodeProps, CarouselProps, CarouselDirection, CarouselSlideDirection, AlertDialogProps } from './AdvancedComponents';
+// Syntax Highlighter
+export { SyntaxHighlighter } from './SyntaxHighlighter';
+export type { SyntaxHighlighterProps, Language } from './SyntaxHighlighter';
+
+// ColorPicker (standalone)
+export { ColorPicker } from './ColorPicker';
+export type { ColorPickerProps } from './ColorPicker';
+
+// DatePicker (standalone)
+export { DatePicker } from './DatePicker';
+export type { DatePickerProps } from './DatePicker';
+
+// Stat components
+export { Stat, StatLabel, StatNumber, StatHelpText, StatArrow, StatGroup } from './Stat';
+export type { StatProps, StatLabelProps, StatNumberProps, StatHelpTextProps, StatArrowProps, StatGroupProps } from './Stat';
+
+// QRCode
+export { QRCode } from './QRCode';
+export type { QRCodeProps } from './QRCode';
+
+// DownloadTrigger
+export { DownloadTrigger } from './DownloadTrigger';
+export type { DownloadTriggerProps } from './DownloadTrigger';
+
+// Advanced Components (others)
+export { TimePicker, CommandPalette, DataTable, TreeView, FileTree, Carousel, AlertDialog } from './AdvancedComponents';
+export type { TimePickerProps, CommandPaletteProps, CommandPaletteItem, DataTableProps, DataTableColumn, TreeViewProps, TreeNode, FileTreeProps, FileTreeItem, CarouselProps, CarouselDirection, CarouselSlideDirection, AlertDialogProps } from './AdvancedComponents';
 
 // Floating Pickers
 export { FloatingColorPicker, FloatingDatePicker, FloatingTimePicker } from './FloatingPickers';

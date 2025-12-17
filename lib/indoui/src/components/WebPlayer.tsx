@@ -1,200 +1,264 @@
-import React, { forwardRef, useState, useRef, useEffect } from 'react';
-import { StyleProps, stylePropsToCSS, extractStyleProps } from '../system/style-props';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { LayoutProps, getLayoutStyles } from '../utils/layoutProps';
+import { Play, RefreshCw, Maximize2, Minimize2, ExternalLink, Code, Eye, Terminal, X, AlertCircle } from 'lucide-react';
 
-export interface WebPlayerProps extends StyleProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
-  code: string;
-  language?: 'jsx' | 'tsx';
-  showPreview?: boolean;
-  showCode?: boolean;
-  showConsole?: boolean;
-  height?: string | number;
-  theme?: 'light' | 'dark';
+export interface WebPlayerProps extends LayoutProps {
+  html?: string;
+  css?: string;
+  js?: string;
+  code?: string; // Alias for js (backward compatibility)
+  srcDoc?: string;
+  src?: string;
   title?: string;
+  showToolbar?: boolean;
+  showConsole?: boolean;
+  consoleHeight?: number;
+  autoRun?: boolean;
+  theme?: 'dark' | 'light';
+  language?: 'jsx' | 'tsx' | 'javascript' | 'typescript';
+  height?: string | number;
+  className?: string;
 }
 
-export const WebPlayer = forwardRef<HTMLDivElement, WebPlayerProps>(
-  (
-    {
-      code,
-      language = 'jsx',
-      showPreview = true,
-      showCode = true,
-      showConsole = true,
-      height = 400,
-      theme = 'dark',
-      title = 'Preview',
-      className = '',
-      style,
-      ...props
-    },
-    ref
-  ) => {
-    const { styleProps, restProps } = extractStyleProps(props);
-    const cssStyles = stylePropsToCSS(styleProps);
-    const [activeTab, setActiveTab] = useState<'preview' | 'code' | 'console'>('preview');
-    const [consoleLogs, setConsoleLogs] = useState<{ type: string; message: string }[]>([]);
-    const [error, setError] = useState<string | null>(null);
-    const iframeRef = useRef<HTMLIFrameElement>(null);
+interface ConsoleMessage {
+  type: 'log' | 'error' | 'warn' | 'info';
+  message: string;
+  timestamp: Date;
+}
 
-    // Generate iframe content
-    const generateIframeContent = () => {
-      return `
+export const WebPlayer: React.FC<WebPlayerProps> = ({
+  html = '',
+  css = '',
+  js = '',
+  code,
+  srcDoc,
+  src,
+  title = 'Preview',
+  showToolbar = true,
+  showConsole = false,
+  consoleHeight = 150,
+  autoRun = true,
+  theme = 'dark',
+  language,
+  height,
+  className,
+  ...layoutProps
+}) => {
+  const jsCode = code || js;
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isConsoleOpen, setIsConsoleOpen] = useState(showConsole);
+  const [consoleMessages, setConsoleMessages] = useState<ConsoleMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  const layoutStyles = getLayoutStyles(layoutProps);
+  
+  const generateSrcDoc = useCallback(() => {
+    if (srcDoc) return srcDoc;
+    
+    return `
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
-      font-family: system-ui, -apple-system, sans-serif;
-      padding: 1rem;
-      background: ${theme === 'dark' ? '#1a1a1a' : '#ffffff'};
-      color: ${theme === 'dark' ? '#ffffff' : '#000000'};
-    }
-    .error { color: #ef4444; padding: 1rem; background: #fef2f2; border-radius: 0.5rem; }
+    body { font-family: system-ui, -apple-system, sans-serif; }
+    ${css}
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  ${html}
   <script>
-    const originalLog = console.log;
-    const originalError = console.error;
-    const originalWarn = console.warn;
+    (function() {
+      const originalConsole = { ...console };
+      const postMessage = (type, args) => {
+        window.parent.postMessage({
+          type: 'console',
+          method: type,
+          message: args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' ')
+        }, '*');
+      };
+      
+      console.log = (...args) => { postMessage('log', args); originalConsole.log(...args); };
+      console.error = (...args) => { postMessage('error', args); originalConsole.error(...args); };
+      console.warn = (...args) => { postMessage('warn', args); originalConsole.warn(...args); };
+      console.info = (...args) => { postMessage('info', args); originalConsole.info(...args); };
+      
+      window.onerror = (msg, url, line, col, error) => {
+        postMessage('error', [\`\${msg} at line \${line}:\${col}\`]);
+      };
+    })();
     
-    console.log = (...args) => {
-      originalLog(...args);
-      window.parent.postMessage({ type: 'console', logType: 'log', message: args.map(a => JSON.stringify(a)).join(' ') }, '*');
-    };
-    console.error = (...args) => {
-      originalError(...args);
-      window.parent.postMessage({ type: 'console', logType: 'error', message: args.map(a => String(a)).join(' ') }, '*');
-    };
-    console.warn = (...args) => {
-      originalWarn(...args);
-      window.parent.postMessage({ type: 'console', logType: 'warn', message: args.map(a => String(a)).join(' ') }, '*');
-    };
-    
-    window.onerror = (message) => {
-      window.parent.postMessage({ type: 'error', message }, '*');
-    };
-  </script>
-  <script type="text/babel" data-type="module">
-    ${code}
+    try {
+      ${jsCode}
+    } catch (e) {
+      console.error(e.message);
+    }
   </script>
 </body>
-</html>`;
+</html>
+    `.trim();
+  }, [html, css, jsCode, srcDoc]);
+  
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'console') {
+        setConsoleMessages(prev => [...prev, {
+          type: event.data.method,
+          message: event.data.message,
+          timestamp: new Date(),
+        }]);
+      }
     };
-
-    useEffect(() => {
-      const handleMessage = (event: MessageEvent) => {
-        if (event.data.type === 'console') {
-          setConsoleLogs(prev => [...prev, { type: event.data.logType, message: event.data.message }]);
-        } else if (event.data.type === 'error') {
-          setError(event.data.message);
-        }
-      };
-      window.addEventListener('message', handleMessage);
-      return () => window.removeEventListener('message', handleMessage);
-    }, []);
-
-    useEffect(() => {
-      setConsoleLogs([]);
-      setError(null);
-    }, [code]);
-
-    const tabs = [
-      { id: 'preview', label: 'Preview', show: showPreview },
-      { id: 'code', label: 'Code', show: showCode },
-      { id: 'console', label: `Console${consoleLogs.length > 0 ? ` (${consoleLogs.length})` : ''}`, show: showConsole },
-    ].filter(t => t.show);
-
-    return (
-      <div
-        ref={ref}
-        className={`indo-webplayer indo-webplayer-${theme} ${className}`}
-        style={{
-          ...cssStyles,
-          height: typeof height === 'number' ? `${height}px` : height,
-          ...style,
-        }}
-        {...restProps}
+    
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+  
+  useEffect(() => {
+    if (autoRun) {
+      refresh();
+    }
+  }, [html, css, jsCode, srcDoc, autoRun]);
+  
+  const refresh = () => {
+    setIsLoading(true);
+    setError(null);
+    setConsoleMessages([]);
+    
+    if (iframeRef.current) {
+      if (src) {
+        iframeRef.current.src = src;
+      } else {
+        iframeRef.current.srcdoc = generateSrcDoc();
+      }
+    }
+    
+    setTimeout(() => setIsLoading(false), 500);
+  };
+  
+  const toggleFullscreen = () => setIsFullscreen(!isFullscreen);
+  
+  const openInNewTab = () => {
+    const blob = new Blob([generateSrcDoc()], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  };
+  
+  const clearConsole = () => setConsoleMessages([]);
+  
+  const getConsoleTypeColor = (type: ConsoleMessage['type']) => {
+    switch (type) {
+      case 'error': return 'indo-webplayer-log-error';
+      case 'warn': return 'indo-webplayer-log-warn';
+      case 'info': return 'indo-webplayer-log-info';
+      default: return '';
+    }
+  };
+  
+  return (
+    <>
+      {isFullscreen && (
+        <div className="indo-webplayer-backdrop" onClick={toggleFullscreen} />
+      )}
+      
+      <div 
+        className={`indo-webplayer indo-webplayer-${theme} ${isFullscreen ? 'indo-webplayer-fullscreen' : ''} ${className || ''}`}
+        style={{ ...layoutStyles, minHeight: '300px', height: typeof height === 'number' ? `${height}px` : height }}
       >
-        <div className="indo-webplayer-header">
-          <div className="indo-webplayer-title">{title}</div>
-          <div className="indo-webplayer-tabs">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                type="button"
-                className={`indo-webplayer-tab ${activeTab === tab.id ? 'indo-webplayer-tab-active' : ''}`}
-                onClick={() => setActiveTab(tab.id as any)}
-              >
-                {tab.label}
+        {showToolbar && (
+          <div className="indo-webplayer-toolbar">
+            <div className="indo-webplayer-toolbar-left">
+              <div className="indo-webplayer-traffic-lights">
+                <div className="indo-webplayer-traffic-light indo-webplayer-traffic-light-red" />
+                <div className="indo-webplayer-traffic-light indo-webplayer-traffic-light-yellow" />
+                <div className="indo-webplayer-traffic-light indo-webplayer-traffic-light-green" />
+              </div>
+              <span className="indo-webplayer-title">{title}</span>
+            </div>
+            
+            <div className="indo-webplayer-toolbar-actions">
+              <button onClick={refresh} className="indo-webplayer-action" title="Refresh">
+                <RefreshCw className={`indo-webplayer-icon ${isLoading ? 'indo-webplayer-icon-spin' : ''}`} />
               </button>
-            ))}
+              <button 
+                onClick={() => setIsConsoleOpen(!isConsoleOpen)} 
+                className={`indo-webplayer-action ${isConsoleOpen ? 'indo-webplayer-action-active' : ''}`}
+                title="Console"
+              >
+                <Terminal className="indo-webplayer-icon" />
+                {consoleMessages.some(m => m.type === 'error') && (
+                  <span className="indo-webplayer-error-badge" />
+                )}
+              </button>
+              <button onClick={openInNewTab} className="indo-webplayer-action" title="Open in new tab">
+                <ExternalLink className="indo-webplayer-icon" />
+              </button>
+              <button onClick={toggleFullscreen} className="indo-webplayer-action" title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}>
+                {isFullscreen ? <Minimize2 className="indo-webplayer-icon" /> : <Maximize2 className="indo-webplayer-icon" />}
+              </button>
+            </div>
           </div>
-          <div className="indo-webplayer-actions">
-            <button
-              type="button"
-              className="indo-webplayer-action"
-              onClick={() => {
-                setConsoleLogs([]);
-                setError(null);
-                if (iframeRef.current) {
-                  iframeRef.current.srcdoc = generateIframeContent();
-                }
-              }}
-              title="Refresh"
-            >
-              ↻
-            </button>
-          </div>
+        )}
+        
+        <div className="indo-webplayer-preview">
+          {isLoading && (
+            <div className="indo-webplayer-loading">
+              <RefreshCw className="indo-webplayer-icon indo-webplayer-icon-spin" />
+            </div>
+          )}
+          
+          {error && (
+            <div className="indo-webplayer-error">
+              <AlertCircle className="indo-webplayer-icon" />
+              <span>{error}</span>
+            </div>
+          )}
+          
+          <iframe
+            ref={iframeRef}
+            title={title}
+            className="indo-webplayer-iframe"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+            srcDoc={src ? undefined : generateSrcDoc()}
+            src={src}
+            onLoad={() => setIsLoading(false)}
+            onError={() => setError('Failed to load content')}
+          />
         </div>
         
-        <div className="indo-webplayer-content">
-          {activeTab === 'preview' && (
-            <div className="indo-webplayer-preview">
-              {error ? (
-                <div className="indo-webplayer-error">{error}</div>
-              ) : (
-                <iframe
-                  ref={iframeRef}
-                  srcDoc={generateIframeContent()}
-                  sandbox="allow-scripts allow-same-origin"
-                  className="indo-webplayer-iframe"
-                />
-              )}
+        {isConsoleOpen && (
+          <div className="indo-webplayer-console" style={{ height: consoleHeight }}>
+            <div className="indo-webplayer-console-header">
+              <span className="indo-webplayer-console-title">
+                Console
+                {consoleMessages.length > 0 && (
+                  <span className="indo-webplayer-console-count">{consoleMessages.length}</span>
+                )}
+              </span>
+              <button onClick={clearConsole} className="indo-webplayer-console-clear">Clear</button>
             </div>
-          )}
-          
-          {activeTab === 'code' && (
-            <div className="indo-webplayer-code">
-              <pre><code>{code}</code></pre>
-            </div>
-          )}
-          
-          {activeTab === 'console' && (
-            <div className="indo-webplayer-console">
-              {consoleLogs.length === 0 ? (
-                <div className="indo-webplayer-console-empty">No console output</div>
+            
+            <div className="indo-webplayer-console-content">
+              {consoleMessages.length === 0 ? (
+                <span className="indo-webplayer-console-empty">Console output will appear here...</span>
               ) : (
-                consoleLogs.map((log, i) => (
-                  <div key={i} className={`indo-webplayer-log indo-webplayer-log-${log.type}`}>
-                    <span className="indo-webplayer-log-type">{log.type}</span>
-                    <span className="indo-webplayer-log-message">{log.message}</span>
+                consoleMessages.map((msg, i) => (
+                  <div key={i} className={`indo-webplayer-log ${getConsoleTypeColor(msg.type)}`}>
+                    <span className="indo-webplayer-log-time">{msg.timestamp.toLocaleTimeString()}</span>
+                    <span className="indo-webplayer-log-message">{msg.message}</span>
                   </div>
                 ))
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-    );
-  }
-);
+    </>
+  );
+};
 
 WebPlayer.displayName = 'WebPlayer';

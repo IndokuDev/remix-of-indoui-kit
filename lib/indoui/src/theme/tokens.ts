@@ -403,3 +403,9 @@ export const getColor = (color: ColorName, shade: ColorShade): string => {
   }
   return '';
 };
+
+// Size keys for components
+export type SizeKey = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+
+// Color scheme for components
+export type ColorScheme = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info' | 'gray';
