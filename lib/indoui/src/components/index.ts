@@ -148,6 +148,22 @@ export type { CodeEditorProps, CodeBlockRootProps, CodeBlockHeaderProps, CodeBlo
 export { ColorPicker, DatePicker, TimePicker, CommandPalette, DataTable, TreeView, FileTree, QRCode, Carousel, AlertDialog } from './AdvancedComponents';
 export type { ColorPickerProps, DatePickerProps, TimePickerProps, CommandPaletteProps, CommandPaletteItem, DataTableProps, DataTableColumn, TreeViewProps, TreeNode, FileTreeProps, FileTreeItem, QRCodeProps, CarouselProps, CarouselDirection, CarouselSlideDirection, AlertDialogProps } from './AdvancedComponents';
 
+// Floating Pickers
+export { FloatingColorPicker, FloatingDatePicker, FloatingTimePicker } from './FloatingPickers';
+export type { FloatingColorPickerProps, FloatingDatePickerProps, FloatingTimePickerProps } from './FloatingPickers';
+
+// Group Components
+export { Group, InputGroup, InputAddon, InputLeftAddon, InputRightAddon } from './Group';
+export type { GroupProps, InputGroupProps, InputAddonProps } from './Group';
+
+// WebPlayer
+export { WebPlayer } from './WebPlayer';
+export type { WebPlayerProps } from './WebPlayer';
+
+// ZodForm
+export { ZodForm, ZodField, ZodInput, ZodTextarea, ZodSelect, ZodCheckbox, ZodFileInput, ZodErrorMessage, ZodSubmit, useZodForm } from './ZodForm';
+export type { ZodFormProps, ZodFieldProps, ZodInputProps, ZodTextareaProps, ZodSelectProps, ZodCheckboxProps, ZodFileInputProps, ZodErrorMessageProps, ZodSubmitProps, ZodSchema, ZodError } from './ZodForm';
+
 // Head/SEO
 export { HeadProvider, useHead, usePageMeta, mergeHead, resolveHead } from './HeadProvider';
 export type { HeadMeta, HeadContextValue } from './HeadProvider';
