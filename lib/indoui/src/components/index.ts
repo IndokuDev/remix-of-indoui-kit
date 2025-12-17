@@ -164,6 +164,10 @@ export type { WebPlayerProps } from './WebPlayer';
 export { ZodForm, ZodField, ZodInput, ZodTextarea, ZodSelect, ZodCheckbox, ZodFileInput, ZodErrorMessage, ZodSubmit, useZodForm } from './ZodForm';
 export type { ZodFormProps, ZodFieldProps, ZodInputProps, ZodTextareaProps, ZodSelectProps, ZodCheckboxProps, ZodFileInputProps, ZodErrorMessageProps, ZodSubmitProps, ZodSchema, ZodError } from './ZodForm';
 
+// TextEditor
+export { TextEditor } from './TextEditor';
+export type { TextEditorProps } from './TextEditor';
+
 // Head/SEO
 export { HeadProvider, useHead, usePageMeta, mergeHead, resolveHead } from './HeadProvider';
 export type { HeadMeta, HeadContextValue } from './HeadProvider';

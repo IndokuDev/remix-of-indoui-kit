@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Stack, Heading, Text, Code, ZodForm, ZodField, ZodInput, ZodTextarea, ZodSelect, ZodCheckbox, ZodErrorMessage, ZodSubmit } from '../../../lib/indoui/src';
+import { Box, Stack, Heading, Text, Code, ZodForm, ZodField, ZodInput, ZodTextarea, ZodSelect, ZodCheckbox, ZodErrorMessage, ZodSubmit } from '../../../../lib/indoui/src';
 import { ComponentPreview } from '../../../components/docs/ComponentPreview';
 import { CodeBlock } from '../../../components/docs/CodeBlock';
 import { z } from 'zod';
