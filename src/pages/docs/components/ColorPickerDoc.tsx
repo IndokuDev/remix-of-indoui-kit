@@ -89,7 +89,7 @@ function Example() {
             <ColorPicker
               value={color}
               onChange={setColor}
-              swatches={[
+              presetColors={[
                 "#1a1a1a", "#333333", "#666666", "#999999", "#cccccc", "#ffffff",
                 "#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff",
               ]}

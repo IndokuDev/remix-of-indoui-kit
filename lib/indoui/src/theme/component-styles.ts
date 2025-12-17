@@ -2775,5 +2775,691 @@ export const componentStyles = `
     font-family: var(--indo-font-mono);
     font-size: 0.875em;
   }
+
+  /* WebPlayer Styles */
+  .indo-webplayer {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid hsl(var(--indo-border));
+    border-radius: var(--indo-radius-lg);
+    overflow: hidden;
+  }
+  
+  .indo-webplayer-dark { background: #1e1e1e; }
+  .indo-webplayer-light { background: #ffffff; }
+  
+  .indo-webplayer-fullscreen {
+    position: fixed;
+    inset: 1rem;
+    z-index: 50;
+  }
+  
+  .indo-webplayer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+  }
+  
+  .indo-webplayer-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid hsl(var(--indo-border));
+  }
+  
+  .indo-webplayer-dark .indo-webplayer-toolbar { background: #252526; }
+  .indo-webplayer-light .indo-webplayer-toolbar { background: #f3f3f3; }
+  
+  .indo-webplayer-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .indo-webplayer-traffic-lights {
+    display: flex;
+    gap: 0.375rem;
+  }
+  
+  .indo-webplayer-traffic-light {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+  }
+  
+  .indo-webplayer-traffic-light-red { background: #ff5f57; }
+  .indo-webplayer-traffic-light-yellow { background: #febc2e; }
+  .indo-webplayer-traffic-light-green { background: #28c840; }
+  
+  .indo-webplayer-title {
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 0.75rem;
+  }
+  
+  .indo-webplayer-dark .indo-webplayer-title { color: #8b8b8b; }
+  .indo-webplayer-light .indo-webplayer-title { color: #6b6b6b; }
+  
+  .indo-webplayer-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .indo-webplayer-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.375rem;
+    border: none;
+    background: transparent;
+    border-radius: var(--indo-radius-sm);
+    cursor: pointer;
+    transition: background var(--indo-transition-fast);
+    position: relative;
+  }
+  
+  .indo-webplayer-dark .indo-webplayer-action { color: #8b8b8b; }
+  .indo-webplayer-dark .indo-webplayer-action:hover { background: #3c3c3c; }
+  .indo-webplayer-light .indo-webplayer-action { color: #6b6b6b; }
+  .indo-webplayer-light .indo-webplayer-action:hover { background: #e0e0e0; }
+  
+  .indo-webplayer-action-active {
+    background: #3c3c3c !important;
+  }
+  
+  .indo-webplayer-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+  
+  .indo-webplayer-icon-spin {
+    animation: indo-spin 1s linear infinite;
+  }
+  
+  @keyframes indo-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  .indo-webplayer-error-badge {
+    position: absolute;
+    top: -0.125rem;
+    right: -0.125rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    background: hsl(var(--indo-destructive));
+    border-radius: 50%;
+  }
+  
+  .indo-webplayer-preview {
+    flex: 1;
+    position: relative;
+    min-height: 200px;
+  }
+  
+  .indo-webplayer-iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: white;
+  }
+  
+  .indo-webplayer-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    background: rgba(30, 30, 30, 0.8);
+  }
+  
+  .indo-webplayer-error {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: rgba(239, 68, 68, 0.1);
+    color: hsl(var(--indo-destructive));
+    z-index: 10;
+  }
+  
+  .indo-webplayer-console {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid hsl(var(--indo-border));
+  }
+  
+  .indo-webplayer-dark .indo-webplayer-console { background: #1e1e1e; }
+  .indo-webplayer-light .indo-webplayer-console { background: #f9f9f9; }
+  
+  .indo-webplayer-console-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.375rem 0.75rem;
+    border-bottom: 1px solid hsl(var(--indo-border));
+  }
+  
+  .indo-webplayer-console-title {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #8b8b8b;
+  }
+  
+  .indo-webplayer-console-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.5rem;
+    padding: 0.125rem 0.375rem;
+    font-size: 0.625rem;
+    background: hsl(var(--indo-primary) / 0.2);
+    color: hsl(var(--indo-primary));
+    border-radius: var(--indo-radius-sm);
+  }
+  
+  .indo-webplayer-console-clear {
+    font-size: 0.75rem;
+    padding: 0.125rem 0.5rem;
+    border: none;
+    background: transparent;
+    color: #8b8b8b;
+    cursor: pointer;
+    border-radius: var(--indo-radius-sm);
+    transition: background var(--indo-transition-fast);
+  }
+  
+  .indo-webplayer-console-clear:hover { background: #3c3c3c; }
+  
+  .indo-webplayer-console-content {
+    flex: 1;
+    overflow: auto;
+    padding: 0.5rem;
+    font-family: var(--indo-font-mono);
+    font-size: 0.75rem;
+  }
+  
+  .indo-webplayer-console-empty { color: #6b6b6b; }
+  
+  .indo-webplayer-log {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.125rem 0;
+  }
+  
+  .indo-webplayer-log-time {
+    opacity: 0.5;
+    user-select: none;
+  }
+  
+  .indo-webplayer-log-message {
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  
+  .indo-webplayer-dark .indo-webplayer-log { color: #d4d4d4; }
+  .indo-webplayer-light .indo-webplayer-log { color: #333; }
+  
+  .indo-webplayer-log-error { color: #f87171 !important; }
+  .indo-webplayer-log-warn { color: #fbbf24 !important; }
+  .indo-webplayer-log-info { color: #60a5fa !important; }
+  
+  /* ColorPicker Styles */
+  .indo-color-picker {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .indo-color-picker-trigger {
+    border: 2px solid hsl(var(--indo-border));
+    border-radius: var(--indo-radius-lg);
+    box-shadow: var(--indo-shadow-sm);
+    cursor: pointer;
+    transition: all var(--indo-transition-fast);
+  }
+  
+  .indo-color-picker-trigger:hover { border-color: hsl(var(--indo-primary)); }
+  .indo-color-picker-trigger:focus { outline: 2px solid hsl(var(--indo-ring)); outline-offset: 2px; }
+  .indo-color-picker-trigger:disabled { opacity: 0.5; cursor: not-allowed; }
+  
+  .indo-color-picker-xs .indo-color-picker-trigger { width: 1.5rem; height: 1.5rem; }
+  .indo-color-picker-sm .indo-color-picker-trigger { width: 2rem; height: 2rem; }
+  .indo-color-picker-md .indo-color-picker-trigger { width: 2.5rem; height: 2.5rem; }
+  .indo-color-picker-lg .indo-color-picker-trigger { width: 3rem; height: 3rem; }
+  .indo-color-picker-xl .indo-color-picker-trigger { width: 3.5rem; height: 3.5rem; }
+  .indo-color-picker-2xl .indo-color-picker-trigger { width: 4rem; height: 4rem; }
+  
+  .indo-color-picker-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(2px);
+  }
+  
+  .indo-color-picker-popup {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    padding: 1rem;
+    background: hsl(var(--indo-bg));
+    border: 1px solid hsl(var(--indo-border));
+    border-radius: var(--indo-radius-xl);
+    box-shadow: var(--indo-shadow-xl);
+    width: 18rem;
+    animation: indo-fade-in 0.15s ease-out;
+  }
+  
+  @keyframes indo-fade-in {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+  
+  .indo-color-picker-gradient {
+    position: relative;
+    width: 100%;
+    height: 10rem;
+    border-radius: var(--indo-radius-lg);
+    cursor: crosshair;
+    margin-bottom: 0.75rem;
+    border: 1px solid hsl(var(--indo-border));
+  }
+  
+  .indo-color-picker-indicator {
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: var(--indo-shadow-md);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+  
+  .indo-color-picker-hue {
+    position: relative;
+    width: 100%;
+    height: 1rem;
+    border-radius: var(--indo-radius-full);
+    cursor: pointer;
+    margin-bottom: 1rem;
+    background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+  }
+  
+  .indo-color-picker-hue-indicator {
+    position: absolute;
+    top: 50%;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: var(--indo-shadow-md);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+  
+  .indo-color-picker-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .indo-color-picker-swatch {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--indo-radius-lg);
+    border: 1px solid hsl(var(--indo-border));
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .indo-color-picker-value { flex: 1; }
+  .indo-color-picker-label { font-size: 0.75rem; color: hsl(var(--indo-muted-fg)); margin-bottom: 0.125rem; }
+  .indo-color-picker-hex { font-family: var(--indo-font-mono); font-size: 0.875rem; color: hsl(var(--indo-fg)); }
+  
+  .indo-color-picker-presets {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .indo-color-picker-preset {
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid transparent;
+    border-radius: var(--indo-radius-lg);
+    cursor: pointer;
+    transition: all var(--indo-transition-fast);
+  }
+  
+  .indo-color-picker-preset:hover { transform: scale(1.1); }
+  .indo-color-picker-preset-active { border-color: hsl(var(--indo-primary)); box-shadow: 0 0 0 2px hsl(var(--indo-primary) / 0.3); }
+  
+  .indo-color-picker-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-family: var(--indo-font-mono);
+    border: 1px solid hsl(var(--indo-border));
+    border-radius: var(--indo-radius-lg);
+    background: hsl(var(--indo-bg));
+    color: hsl(var(--indo-fg));
+  }
+  
+  /* DatePicker Styles */
+  .indo-date-picker {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .indo-date-picker-trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid hsl(var(--indo-border));
+    border-radius: var(--indo-radius-md);
+    background: hsl(var(--indo-bg));
+    color: hsl(var(--indo-fg));
+    cursor: pointer;
+    transition: all var(--indo-transition-fast);
+  }
+  
+  .indo-date-picker-trigger:hover { background: hsl(var(--indo-bg-muted)); }
+  .indo-date-picker-trigger:focus { outline: 2px solid hsl(var(--indo-ring)); outline-offset: 2px; }
+  .indo-date-picker-trigger:disabled { opacity: 0.5; cursor: not-allowed; }
+  
+  .indo-date-picker-xs .indo-date-picker-trigger { height: 1.75rem; font-size: 0.75rem; padding: 0 0.5rem; }
+  .indo-date-picker-sm .indo-date-picker-trigger { height: 2rem; font-size: 0.875rem; padding: 0 0.625rem; }
+  .indo-date-picker-md .indo-date-picker-trigger { height: 2.5rem; font-size: 0.875rem; padding: 0 0.75rem; }
+  .indo-date-picker-lg .indo-date-picker-trigger { height: 2.75rem; font-size: 1rem; padding: 0 0.875rem; }
+  .indo-date-picker-xl .indo-date-picker-trigger { height: 3rem; font-size: 1.125rem; padding: 0 1rem; }
+  .indo-date-picker-2xl .indo-date-picker-trigger { height: 3.5rem; font-size: 1.25rem; padding: 0 1.25rem; }
+  
+  .indo-date-picker-icon { width: 1rem; height: 1rem; color: hsl(var(--indo-muted-fg)); }
+  .indo-date-picker-placeholder { color: hsl(var(--indo-muted-fg)); }
+  
+  .indo-date-picker-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(2px);
+  }
+  
+  .indo-date-picker-popup {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    padding: 1rem;
+    background: hsl(var(--indo-bg));
+    border: 1px solid hsl(var(--indo-border));
+    border-radius: var(--indo-radius-xl);
+    box-shadow: var(--indo-shadow-xl);
+    width: 20rem;
+    animation: indo-fade-in 0.15s ease-out;
+  }
+  
+  .indo-date-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  
+  .indo-date-picker-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border: none;
+    background: transparent;
+    border-radius: var(--indo-radius-lg);
+    cursor: pointer;
+    transition: background var(--indo-transition-fast);
+    color: hsl(var(--indo-fg));
+  }
+  
+  .indo-date-picker-nav:hover { background: hsl(var(--indo-bg-muted)); }
+  .indo-date-picker-nav-icon { width: 1rem; height: 1rem; }
+  
+  .indo-date-picker-header-text {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    font-weight: 600;
+    color: hsl(var(--indo-fg));
+    border: none;
+    background: transparent;
+    border-radius: var(--indo-radius-lg);
+    cursor: pointer;
+    transition: background var(--indo-transition-fast);
+  }
+  
+  .indo-date-picker-header-text:hover { background: hsl(var(--indo-bg-muted)); }
+  .indo-date-picker-header-chevron { width: 0.75rem; height: 0.75rem; }
+  
+  .indo-date-picker-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .indo-date-picker-weekday {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: hsl(var(--indo-muted-fg));
+    text-align: center;
+    padding: 0.5rem;
+  }
+  
+  .indo-date-picker-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
+  }
+  
+  .indo-date-picker-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.25rem;
+    width: 2.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    border-radius: var(--indo-radius-lg);
+    cursor: pointer;
+    transition: all var(--indo-transition-fast);
+    color: hsl(var(--indo-fg));
+  }
+  
+  .indo-date-picker-day:hover { background: hsl(var(--indo-bg-muted)); }
+  
+  .indo-date-picker-day-selected {
+    background: hsl(var(--indo-primary)) !important;
+    color: hsl(var(--indo-primary-fg)) !important;
+    box-shadow: var(--indo-shadow-md);
+  }
+  
+  .indo-date-picker-day-today {
+    border: 2px solid hsl(var(--indo-primary));
+    color: hsl(var(--indo-primary));
+  }
+  
+  .indo-date-picker-day-disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  
+  .indo-date-picker-months,
+  .indo-date-picker-years {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .indo-date-picker-month,
+  .indo-date-picker-year {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    border-radius: var(--indo-radius-lg);
+    cursor: pointer;
+    transition: all var(--indo-transition-fast);
+    color: hsl(var(--indo-fg));
+  }
+  
+  .indo-date-picker-month:hover,
+  .indo-date-picker-year:hover { background: hsl(var(--indo-bg-muted)); }
+  
+  .indo-date-picker-month-selected,
+  .indo-date-picker-year-selected {
+    background: hsl(var(--indo-primary)) !important;
+    color: hsl(var(--indo-primary-fg)) !important;
+  }
+  
+  .indo-date-picker-month-today,
+  .indo-date-picker-year-today {
+    border: 2px solid hsl(var(--indo-primary));
+    color: hsl(var(--indo-primary));
+  }
+  
+  .indo-date-picker-today {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: hsl(var(--indo-primary));
+    border: 1px solid hsl(var(--indo-primary) / 0.2);
+    background: transparent;
+    border-radius: var(--indo-radius-lg);
+    cursor: pointer;
+    transition: background var(--indo-transition-fast);
+  }
+  
+  .indo-date-picker-today:hover { background: hsl(var(--indo-primary) / 0.1); }
+  
+  /* SyntaxHighlighter Styles */
+  .indo-syntax-highlighter {
+    border: 1px solid hsl(var(--indo-border));
+    border-radius: var(--indo-radius-lg);
+    overflow: hidden;
+  }
+  
+  .indo-syntax-highlighter-dark { background: #1e1e1e; }
+  .indo-syntax-highlighter-light { background: #ffffff; }
+  
+  .indo-syntax-highlighter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid hsl(var(--indo-border));
+  }
+  
+  .indo-syntax-highlighter-dark .indo-syntax-highlighter-header { background: #252526; color: #cccccc; }
+  .indo-syntax-highlighter-light .indo-syntax-highlighter-header { background: #f3f3f3; color: #616161; }
+  
+  .indo-syntax-highlighter-filename { font-size: 0.75rem; font-weight: 500; }
+  
+  .indo-syntax-highlighter-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border: none;
+    background: transparent;
+    border-radius: var(--indo-radius-sm);
+    cursor: pointer;
+    transition: background var(--indo-transition-fast);
+  }
+  
+  .indo-syntax-highlighter-dark .indo-syntax-highlighter-copy { color: #cccccc; }
+  .indo-syntax-highlighter-dark .indo-syntax-highlighter-copy:hover { background: #3c3c3c; }
+  .indo-syntax-highlighter-light .indo-syntax-highlighter-copy { color: #616161; }
+  .indo-syntax-highlighter-light .indo-syntax-highlighter-copy:hover { background: #e4e4e4; }
+  
+  .indo-syntax-highlighter-icon { width: 0.875rem; height: 0.875rem; }
+  
+  .indo-syntax-highlighter-pre {
+    overflow: auto;
+    padding: 1rem;
+    font-family: var(--indo-font-mono);
+    margin: 0;
+  }
+  
+  .indo-syntax-highlighter-xs .indo-syntax-highlighter-pre { font-size: 0.625rem; line-height: 1rem; }
+  .indo-syntax-highlighter-sm .indo-syntax-highlighter-pre { font-size: 0.75rem; line-height: 1.25rem; }
+  .indo-syntax-highlighter-md .indo-syntax-highlighter-pre { font-size: 0.875rem; line-height: 1.5rem; }
+  .indo-syntax-highlighter-lg .indo-syntax-highlighter-pre { font-size: 1rem; line-height: 1.75rem; }
+  .indo-syntax-highlighter-xl .indo-syntax-highlighter-pre { font-size: 1.125rem; line-height: 2rem; }
+  .indo-syntax-highlighter-2xl .indo-syntax-highlighter-pre { font-size: 1.25rem; line-height: 2.25rem; }
+  
+  .indo-syntax-highlighter-line { display: table-row; }
+  
+  .indo-syntax-highlighter-line-number {
+    display: table-cell;
+    padding-right: 1rem;
+    text-align: right;
+    user-select: none;
+  }
+  
+  .indo-syntax-highlighter-dark .indo-syntax-highlighter-line-number { color: #858585; }
+  .indo-syntax-highlighter-light .indo-syntax-highlighter-line-number { color: #999999; }
+  
+  .indo-syntax-highlighter-line-content { display: table-cell; }
+  
+  /* Stat Styles */
+  .indo-stat { display: flex; flex-direction: column; }
+  .indo-stat-label { font-size: 0.875rem; font-weight: 500; color: hsl(var(--indo-muted-fg)); }
+  .indo-stat-number { font-size: 1.5rem; font-weight: 600; color: hsl(var(--indo-fg)); }
+  .indo-stat-help-text { font-size: 0.875rem; color: hsl(var(--indo-muted-fg)); }
+  .indo-stat-arrow { width: 1rem; height: 1rem; display: inline-block; }
+  .indo-stat-arrow-increase { color: #22c55e; }
+  .indo-stat-arrow-decrease { color: #ef4444; }
+  .indo-stat-group { display: flex; flex-wrap: wrap; gap: 2rem; }
+  
+  /* QRCode Styles */
+  .indo-qrcode { display: inline-flex; color: hsl(var(--indo-fg)); }
+  
+  /* DownloadTrigger Styles */
+  .indo-download-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: var(--indo-radius-md);
+    background: hsl(var(--indo-primary));
+    color: hsl(var(--indo-primary-fg));
+    cursor: pointer;
+    transition: opacity var(--indo-transition-fast);
+  }
+  
+  .indo-download-trigger:hover { opacity: 0.9; }
+  .indo-download-trigger:disabled { opacity: 0.5; cursor: not-allowed; }
+  .indo-download-trigger-icon { width: 1rem; height: 1rem; }
+  
+  .indo-download-trigger-wrapper { cursor: pointer; }
+  .indo-download-trigger-disabled { opacity: 0.5; cursor: not-allowed; }
 `;
 
