@@ -1,13 +1,39 @@
-import { useState } from "react";
 import { Box, Tabs, TabList, Tab, TabPanels, TabPanel } from "../../../lib/indoui/src";
 import { CodeBlock } from "./CodeBlock";
 
-interface ComponentPreviewProps {
+export interface ComponentPreviewProps {
   children: React.ReactNode;
-  code: string;
+  code?: string;
 }
 
 export const ComponentPreview = ({ children, code }: ComponentPreviewProps) => {
+  // If no code provided, just show the preview
+  if (!code) {
+    return (
+      <Box
+        rounded="lg"
+        overflow="hidden"
+        style={{
+          border: "1px solid hsl(var(--indo-border))",
+        }}
+      >
+        <Box
+          p={6}
+          rounded="md"
+          style={{
+            backgroundColor: "hsl(var(--indo-bg-subtle))",
+            minHeight: "120px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {children}
+        </Box>
+      </Box>
+    );
+  }
+
   return (
     <Box
       rounded="lg"

@@ -95,6 +95,11 @@ import NavigationMenuDoc from "./pages/docs/components/NavigationMenuDoc";
 
 // Advanced
 import CodeEditorDoc from "./pages/docs/components/CodeEditorDoc";
+import GroupDoc from "./pages/docs/components/GroupDoc";
+import FloatingPickersDoc from "./pages/docs/components/FloatingPickersDoc";
+import WebPlayerDoc from "./pages/docs/components/WebPlayerDoc";
+import ZodFormDoc from "./pages/docs/components/ZodFormDoc";
+import HeadProviderDoc from "./pages/docs/components/HeadProviderDoc";
 
 // Hook docs
 import UseColorModeDoc from "./pages/docs/hooks/UseColorModeDoc";
@@ -202,6 +207,11 @@ const App = () => (
           <Route path="components/navigation-menu" element={<NavigationMenuDoc />} />
           {/* Advanced */}
           <Route path="components/code-editor" element={<CodeEditorDoc />} />
+          <Route path="components/group" element={<GroupDoc />} />
+          <Route path="components/floating-pickers" element={<FloatingPickersDoc />} />
+          <Route path="components/web-player" element={<WebPlayerDoc />} />
+          <Route path="components/zod-form" element={<ZodFormDoc />} />
+          <Route path="components/head-provider" element={<HeadProviderDoc />} />
           {/* Hooks */}
           <Route path="hooks/use-color-mode" element={<UseColorModeDoc />} />
           <Route path="hooks/use-theme" element={<UseThemeDoc />} />

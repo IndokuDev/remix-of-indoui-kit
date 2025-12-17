@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Stack, Heading, Text, Code, Group, Input, Button, IconButton } from '../../../lib/indoui/src';
+import { Box, Stack, Heading, Text, Code, Group, Input, Button, IconButton } from '../../../../lib/indoui/src';
 import { ComponentPreview } from '../../../components/docs/ComponentPreview';
 import { CodeBlock } from '../../../components/docs/CodeBlock';
 
