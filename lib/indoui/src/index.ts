@@ -21,6 +21,20 @@ export {
   useBreakpoint,
   useBreakpointValue,
   useMediaQuery,
+  useControllableState,
+  useMergeRefs,
+  useEventListener,
+  useDebounce,
+  useDebouncedCallback,
+  useThrottle,
+  useThrottledCallback,
+  usePrevious,
+  useMounted,
+  useIsMounted,
+  useId,
+  useIds,
+  useSSR,
+  useSafeLayoutEffect,
 } from './hooks';
 export type {
   ColorMode,
@@ -30,6 +44,7 @@ export type {
   UseDisclosureReturn,
   UseClipboardOptions,
   UseClipboardReturn,
+  UseControllableStateProps,
 } from './hooks';
 
 // Components

@@ -57,6 +57,22 @@ import BreadcrumbDoc from "./pages/docs/components/BreadcrumbDoc";
 import StepsDoc from "./pages/docs/components/StepsDoc";
 import TooltipDoc from "./pages/docs/components/TooltipDoc";
 
+// Hook docs
+import UseColorModeDoc from "./pages/docs/hooks/UseColorModeDoc";
+import UseDisclosureDoc from "./pages/docs/hooks/UseDisclosureDoc";
+import UseClipboardDoc from "./pages/docs/hooks/UseClipboardDoc";
+import UseBreakpointDoc from "./pages/docs/hooks/UseBreakpointDoc";
+import UseDebounceDoc from "./pages/docs/hooks/UseDebounceDoc";
+import UseThrottleDoc from "./pages/docs/hooks/UseThrottleDoc";
+import UseControllableStateDoc from "./pages/docs/hooks/UseControllableStateDoc";
+import UseMergeRefsDoc from "./pages/docs/hooks/UseMergeRefsDoc";
+import UseEventListenerDoc from "./pages/docs/hooks/UseEventListenerDoc";
+import UsePreviousDoc from "./pages/docs/hooks/UsePreviousDoc";
+import UseMountedDoc from "./pages/docs/hooks/UseMountedDoc";
+import UseIdDoc from "./pages/docs/hooks/UseIdDoc";
+import UseSSRDoc from "./pages/docs/hooks/UseSSRDoc";
+import UseThemeDoc from "./pages/docs/hooks/UseThemeDoc";
+
 const App = () => (
   <IndoUIProvider defaultColorMode="light">
     <BrowserRouter>
@@ -122,7 +138,23 @@ const App = () => (
           <Route path="components/color-picker" element={<ColorPickerDoc />} />
           <Route path="components/command-palette" element={<CommandPaletteDoc />} />
           <Route path="components/date-picker" element={<DatePickerDoc />} />
+          {/* Hooks */}
+          <Route path="hooks/use-color-mode" element={<UseColorModeDoc />} />
+          <Route path="hooks/use-theme" element={<UseThemeDoc />} />
+          <Route path="hooks/use-disclosure" element={<UseDisclosureDoc />} />
+          <Route path="hooks/use-clipboard" element={<UseClipboardDoc />} />
+          <Route path="hooks/use-breakpoint" element={<UseBreakpointDoc />} />
+          <Route path="hooks/use-debounce" element={<UseDebounceDoc />} />
+          <Route path="hooks/use-throttle" element={<UseThrottleDoc />} />
+          <Route path="hooks/use-controllable-state" element={<UseControllableStateDoc />} />
+          <Route path="hooks/use-merge-refs" element={<UseMergeRefsDoc />} />
+          <Route path="hooks/use-event-listener" element={<UseEventListenerDoc />} />
+          <Route path="hooks/use-previous" element={<UsePreviousDoc />} />
+          <Route path="hooks/use-mounted" element={<UseMountedDoc />} />
+          <Route path="hooks/use-id" element={<UseIdDoc />} />
+          <Route path="hooks/use-ssr" element={<UseSSRDoc />} />
           <Route path="components/*" element={<Introduction />} />
+          <Route path="hooks/*" element={<Introduction />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
