@@ -39,10 +39,10 @@ const SliderDoc = () => {
         <Card variant="outline" p={6}>
           <Heading as="h3" size="md" mb={4}>Colors</Heading>
           <VStack spacing={4} align="stretch" maxW="400px">
-            <Slider colorPalette="blue" defaultValue={40} />
-            <Slider colorPalette="green" defaultValue={60} />
-            <Slider colorPalette="red" defaultValue={80} />
-            <Slider colorPalette="purple" defaultValue={50} />
+            <Slider colorPalette="teal" defaultValue={40} />
+            <Slider colorPalette="emerald" defaultValue={60} />
+            <Slider colorPalette="rose" defaultValue={80} />
+            <Slider colorPalette="amber" defaultValue={50} />
           </VStack>
         </Card>
 

@@ -30,11 +30,11 @@ const SpinnerDoc = () => {
         <Card variant="outline" p={6}>
           <Heading as="h3" size="md" mb={4}>Colors</Heading>
           <HStack spacing={6}>
-            <Spinner colorPalette="blue" size="lg" />
-            <Spinner colorPalette="green" size="lg" />
-            <Spinner colorPalette="red" size="lg" />
-            <Spinner colorPalette="purple" size="lg" />
-            <Spinner colorPalette="amber" size="lg" />
+            <Spinner size="lg" />
+            <Spinner size="lg" />
+            <Spinner size="lg" />
+            <Spinner size="lg" />
+            <Spinner size="lg" />
           </HStack>
         </Card>
 

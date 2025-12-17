@@ -18,7 +18,7 @@ const LinkDoc = () => {
 
         <Card variant="outline" p={6}>
           <Heading as="h3" size="md" mb={4}>Basic Links</Heading>
-          <VStack spacing={3} align="start">
+          <VStack spacing={3} align="flex-start">
             <Link href="#">Default Link</Link>
             <Link href="#" color="blue.500">Colored Link</Link>
             <Link href="#" isExternal>External Link →</Link>

@@ -21,15 +21,12 @@ const StepsDoc = () => {
 
         <Card variant="outline" p={6}>
           <Heading as="h3" size="md" mb={4}>Interactive Steps</Heading>
-          <Steps
-            currentStep={currentStep}
-            steps={[
-              { title: 'Account', description: 'Create your account' },
-              { title: 'Profile', description: 'Set up your profile' },
-              { title: 'Review', description: 'Review and confirm' },
-              { title: 'Complete', description: 'All done!' },
-            ]}
-          />
+          <Steps activeStep={currentStep}>
+            <Step title="Account" description="Create your account" />
+            <Step title="Profile" description="Set up your profile" />
+            <Step title="Review" description="Review and confirm" />
+            <Step title="Complete" description="All done!" />
+          </Steps>
           <HStack mt={6} justify="center" spacing={4}>
             <Button 
               variant="outline" 
@@ -50,14 +47,11 @@ const StepsDoc = () => {
 
         <Card variant="outline" p={6}>
           <Heading as="h3" size="md" mb={4}>Vertical Steps</Heading>
-          <Steps
-            orientation="vertical"
-            currentStep={2}
-            steps={[
-              { title: 'Step 1', description: 'First step completed' },
-              { title: 'Step 2', description: 'Second step completed' },
-              { title: 'Step 3', description: 'Current step' },
-              { title: 'Step 4', description: 'Pending step' },
+          <Steps orientation="vertical" activeStep={2}>
+            <Step title="Step 1" description="First step completed" />
+            <Step title="Step 2" description="Second step completed" />
+            <Step title="Step 3" description="Current step" />
+            <Step title="Step 4" description="Pending step" />
             ]}
           />
         </Card>
